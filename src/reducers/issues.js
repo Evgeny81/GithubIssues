@@ -1,7 +1,8 @@
-import { RECEIVE_DATA, REQUEST_DATA, ERROR_RECEIVE_DATA } from '../actions/types';
+import { RECEIVE_DATA, REQUEST_DATA, ERROR_RECEIVE_DATA, PAGINATION } from '../actions/types';
 
 const INITIAL_STATE = {
     data: [],
+    pagination: {},
 };
 
 export default function issues(state = INITIAL_STATE, action) {
@@ -14,6 +15,11 @@ export default function issues(state = INITIAL_STATE, action) {
         return {
             ...state,
             data: action.data,
+        };
+    case PAGINATION:
+        return {
+            ...state,
+            pagination: action.pages,
         };
     case ERROR_RECEIVE_DATA:
         return {

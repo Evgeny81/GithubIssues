@@ -4,16 +4,17 @@ import PropTypes from 'prop-types';
 import './App.css';
 import Table from './Table';
 import fetchData from '../actions/fetch';
+import Pagination from "./common/Pagination";
 
 class App extends Component {
     state = {
-        searchRequest: '',
+        searchRequest: 'facebook/react',
         inputRequest: '',
     };
 
     handleSearch = (e) => {
         e.preventDefault();
-        this.props.dispatch(fetchData(`repos/${this.state.searchRequest}/issues`));
+        this.props.dispatch(fetchData(`repos/${this.state.searchRequest}/issues`, { per_page: 10 }));
     };
 
     handleInput = (e) => {
@@ -30,6 +31,7 @@ class App extends Component {
                     <h2>Find all github repo issues</h2>
                     <form className="searchForm">
                         <input
+                            value="facebook/react"
                             className="searchInput"
                             type="text"
                             placeholder="username/repo"
@@ -39,6 +41,9 @@ class App extends Component {
                         <p className="searchHint">username/repo</p>}
                         <button className="searchButton" onClick={this.handleSearch}>Search</button>
                     </form>
+                    <Pagination
+                        pages={this.props.issues.pagination}
+                    />
                 </aside>
                 <main className="main">
                     <Table data={this.props.issues.data} />
@@ -57,10 +62,11 @@ export default connect(mapStateToProps)(App);
 
 App.propTypes = {
     dispatch: PropTypes.func,
-    issues: PropTypes.objectOf(PropTypes.array),
+    issues: PropTypes.objectOf(PropTypes.any),
 };
 
 App.defaultProps = {
-    dispatch: () => {},
+    dispatch: () => {
+    },
     issues: {},
 };
