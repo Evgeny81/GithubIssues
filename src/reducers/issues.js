@@ -3,6 +3,7 @@ import { RECEIVE_DATA, REQUEST_DATA, ERROR_RECEIVE_DATA, PAGINATION } from '../a
 const INITIAL_STATE = {
     data: [],
     pagination: {},
+    error: '',
 };
 
 export default function issues(state = INITIAL_STATE, action) {
@@ -10,11 +11,14 @@ export default function issues(state = INITIAL_STATE, action) {
     case REQUEST_DATA:
         return {
             ...state,
+            loading: true,
         };
     case RECEIVE_DATA:
         return {
             ...state,
             data: action.data,
+            error: '',
+            loading: false,
         };
     case PAGINATION:
         return {
@@ -23,8 +27,9 @@ export default function issues(state = INITIAL_STATE, action) {
         };
     case ERROR_RECEIVE_DATA:
         return {
-            ...state,
             ...INITIAL_STATE,
+            error: action.error,
+            loading: false,
         };
     default:
         return state;

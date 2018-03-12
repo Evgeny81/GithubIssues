@@ -4,6 +4,10 @@
     display: inline-flex;
 }
 
+/*
+* Search sidebar
+*/
+
 .aside {
     display: flex;
     position: fixed;
@@ -16,6 +20,7 @@
 .searchForm {
     text-align: center;
     position: relative;
+    margin-bottom: 10px;
 }
 
 .searchInput {
@@ -30,13 +35,34 @@
     font-size: 13px;
     position: absolute;
     width: 100%;
-    top: 14px;
+    visibility: hidden;
+    top: -9px;
     color: #dccece;
+    transition: top 0.5s;
+}
+.searchHint.show {
+    visibility: visible;
+    top: 10px;
 }
 
 .searchButton {
     width: 100%;
+    cursor: pointer;
 }
+
+.paginationWrapper {
+    display: flex;
+    justify-content: space-around;
+}
+
+.paginationWrapper label {
+    margin-left: 5px;
+    font-size: 12px;
+}
+
+/*
+* Main part
+*/
 
 .main {
     width: 100%;
@@ -59,4 +85,10 @@
     padding: 0;
     margin: 0;
     list-style-type: none;
+}
+
+.error {
+    text-align: center;
+    color: red;
+    font-size: 30px;
 }

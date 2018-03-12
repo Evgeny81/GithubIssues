@@ -2,47 +2,71 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import './App.css';
+import SearchForm from './SearchForm';
 import Table from './Table';
 import fetchData from '../actions/fetch';
 import Pagination from './common/Pagination';
 
 class App extends Component {
     state = {
-        searchRequest: 'facebook/react',
+        searchRequest: '',
+        pagination: {
+            per_page: 10,
+            page: 1,
+        },
     };
 
     handleSearch = (e) => {
         e.preventDefault();
-        this.props.dispatch(fetchData(`repos/${this.state.searchRequest}/issues`, { per_page: 10 }));
+        const { searchRequest, pagination } = this.state;
+        const { dispatch } = this.props;
+
+        this.setState({
+            perPageTouched: false,
+        });
+
+        if (searchRequest) {
+            dispatch(fetchData(`repos/${searchRequest}/issues`, pagination));
+        }
     };
 
     handleInput = (e) => {
         this.setState({ searchRequest: e.target.value });
     };
 
+    handlePagination = type => (e) => {
+        this.setState({
+            perPageTouched: type === 'per_page',
+            pagination: {
+                ...this.state.pagination,
+                page: type === 'per_page' && 1,
+                [type]: e.target.value,
+            },
+        });
+    };
+
     render() {
+        const { searchRequest, perPageTouched } = this.state;
+        const { issues } = this.props;
         return (
             <div className="wrapper">
                 <aside className="aside">
                     <h2>Find all github repo issues</h2>
-                    <form className="searchForm">
-                        <input
-                            value={this.state.searchRequest}
-                            className="searchInput"
-                            type="text"
-                            placeholder="username/repo"
-                            onInput={this.handleInput}
-                        />
-                        {this.state.searchRequest &&
-                        <p className="searchHint">username/repo</p>}
-                        <button className="searchButton" onClick={this.handleSearch}>Search</button>
-                    </form>
+                    <SearchForm
+                        searchRequest={searchRequest}
+                        handleSearch={this.handleSearch}
+                        handleInput={this.handleInput}
+                    />
                     <Pagination
-                        pages={this.props.issues.pagination}
+                        pages={perPageTouched ? {} : issues.pagination}
+                        handlePagination={this.handlePagination}
                     />
                 </aside>
                 <main className="main">
-                    <Table data={this.props.issues.data} />
+                    <Table
+                        data={issues.data}
+                        error={issues.error}
+                    />
                 </main>
             </div>
         );
@@ -57,11 +81,10 @@ function mapStateToProps(state) {
 export default connect(mapStateToProps)(App);
 
 App.propTypes = {
-    dispatch: PropTypes.func,
+    dispatch: PropTypes.func.isRequired,
     issues: PropTypes.objectOf(PropTypes.any),
 };
 
 App.defaultProps = {
-    dispatch: () => {},
     issues: {},
 };

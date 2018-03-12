@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { ERROR_RECEIVE_DATA, RECEIVE_DATA, REQUEST_DATA, PAGINATION } from './types';
 import settings from '../config/settings';
 
@@ -28,60 +29,36 @@ function pagination(pages) {
     };
 }
 
-function paginationParser(link) {
+function getPageQuantity(link) {
     const pages = {};
     link.split(', ')
-        .map((item) => {
-            return item.split('; ')
-                .map((i) => {
-                    if (i.indexOf('rel') !== -1) {
-                        return i.slice(i.indexOf('=') + 1)
+        .map(item =>
+                item.split('; ')
+                    .map((i) => {
+                        if (i.indexOf('rel') !== -1) {
+                            return i.slice(i.indexOf('=') + 1)
                                 .slice(1, -1);
-                    }
-                    return i.slice(i.lastIndexOf('=') + 1, -1);
-                })
-                .reduce((prev, current) => {
-                    pages[current] = +prev;
-                });
-        });
+                        }
+                        return i.slice(i.lastIndexOf('=') + 1, -1);
+                    })
+                    /* eslint-disable array-callback-return */
+                    .reduce((prev, current) => {
+                        pages[current] = +prev;
+                    }),
+                    /* eslint-enable array-callback-return */
+        );
     return pages;
 }
 
-function getQueryString(params) {
-    const encode = encodeURIComponent;
-    return Object.keys(params)
-        .map(k => `${encode(k)}=${encode(params[k])}`)
-        .join('&');
-}
 
-function getUrl(url, queryParams) {
-    if (Object.keys(queryParams).length > 0) {
-        return `${url}?${getQueryString(queryParams)}`;
-    }
-    return url;
-}
-
-
-export default function fetchData(url, params = {
-    per_page: 30,
-}) {
+export default function fetchData(url, params) {
     return (dispatch) => {
         dispatch(request());
-        return fetch(getUrl(settings.BASE_URL + url, params))
+        return axios.get(settings.BASE_URL + url, { params })
             .then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response;
-                }
-                const error = new Error(response.error);
-                error.response = response;
-                throw error;
+                dispatch(pagination(getPageQuantity(response.headers.link)));
+                dispatch(receive(response.data));
             })
-            .then(response => {
-                let link = response.headers.get('link', null);
-                dispatch(pagination(paginationParser(link)));
-                return response.json();
-            })
-            .then(response => dispatch(receive(response)))
             .catch(error => dispatch(errorReceive(error)));
     };
 }

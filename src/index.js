@@ -4,10 +4,13 @@ import { Provider } from 'react-redux';
 import { applyMiddleware, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { logger } from 'redux-logger';
+import moment from 'moment';
 import registerServiceWorker from './registerServiceWorker';
 import RootReducer from './reducers/RootReducer';
 import './index.css';
 import App from './components/App';
+
+moment.locale('ru');
 
 const store = createStore(
     RootReducer,
