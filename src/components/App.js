@@ -4,12 +4,11 @@ import PropTypes from 'prop-types';
 import './App.css';
 import Table from './Table';
 import fetchData from '../actions/fetch';
-import Pagination from "./common/Pagination";
+import Pagination from './common/Pagination';
 
 class App extends Component {
     state = {
         searchRequest: 'facebook/react',
-        inputRequest: '',
     };
 
     handleSearch = (e) => {
@@ -18,10 +17,7 @@ class App extends Component {
     };
 
     handleInput = (e) => {
-        // fetch(`https://api.github.com/users/${this.state.inputRequest}/repos`)
-        //     .then(response => response.json())
-        //     .then(response => console.log(response));
-        this.setState({ searchRequest: e.target.value, inputRequest: e.target.value });
+        this.setState({ searchRequest: e.target.value });
     };
 
     render() {
@@ -31,7 +27,7 @@ class App extends Component {
                     <h2>Find all github repo issues</h2>
                     <form className="searchForm">
                         <input
-                            value="facebook/react"
+                            value={this.state.searchRequest}
                             className="searchInput"
                             type="text"
                             placeholder="username/repo"
@@ -66,7 +62,6 @@ App.propTypes = {
 };
 
 App.defaultProps = {
-    dispatch: () => {
-    },
+    dispatch: () => {},
     issues: {},
 };
